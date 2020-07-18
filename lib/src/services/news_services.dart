@@ -11,6 +11,9 @@ class NewsServices with ChangeNotifier{
   final _API_KEY = '1b9f1ac2c51f43dc961af717b0cd91f6';
 
   List<Article> headlines = [];
+  String _selectedCategory = 'business';
+
+  Map<String,List<Article>> categoryArticles = {};
 
   List<Category> categories = [
     Category( FontAwesomeIcons.building, 'business' ),
@@ -24,8 +27,22 @@ class NewsServices with ChangeNotifier{
 
   NewsServices(){
     this.getTopHeadlines();
+
+    categories.forEach((item) { 
+      this.categoryArticles[item.name] = new List();
+    });
+
   }
 
+  get selectedCategory => this._selectedCategory;
+
+  set selectedCategory( String category ){
+    this._selectedCategory = category;
+
+    this.getArticlesByCategory(category);
+
+    notifyListeners();
+  }
 
   getTopHeadlines() async{
     print('Cargando headlines');
@@ -38,6 +55,22 @@ class NewsServices with ChangeNotifier{
 
     this.headlines.addAll( newsResponse.articles );
     
+    notifyListeners();
+  }
+
+  getArticlesByCategory(String category) async{
+    print('cargando articulos de ' + category);
+    
+    if(this.categoryArticles[category].length > 0)
+      return this.categoryArticles[category];
+
+    final url = '$_URL_NEWS/top-headlines?apiKey=$_API_KEY&country=co&category=$category';
+
+    final resp = await http.get(url);
+
+    final newsResponse = newsResponseFromJson(resp.body);
+
+    this.categoryArticles[category].addAll( newsResponse.articles );
     notifyListeners();
   }
 
