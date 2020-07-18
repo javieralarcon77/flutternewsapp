@@ -44,6 +44,8 @@ class NewsServices with ChangeNotifier{
     notifyListeners();
   }
 
+  List<Article> get getArticulosCategoriaSeleccionada => this.categoryArticles[ this._selectedCategory ];
+
   getTopHeadlines() async{
     print('Cargando headlines');
     
@@ -60,7 +62,7 @@ class NewsServices with ChangeNotifier{
 
   getArticlesByCategory(String category) async{
     print('cargando articulos de ' + category);
-    
+
     if(this.categoryArticles[category].length > 0)
       return this.categoryArticles[category];
 
